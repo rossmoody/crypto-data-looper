@@ -2,7 +2,7 @@
 
 This is an abstracted database updater function for use on the [fomocryptocalculator.com](https://www.fomocryptocalculator.com) website. The CoinGecko rate limiting was causing problems so I made this function to grab missing closing prices for available cryptocurrencies and log them to a database.
 
-It depends on Firebase private key environment variables inside `firebase-config.ts` so you won't be able to run it without generating your own.
+It depends on Firebase private key environment variables inside `firebase-config.ts` and leverages Cloud Functions so it likely won't be of much use to you reading this.
 
 ## 🚀Setup locally
 

@@ -32,6 +32,7 @@ async function getPastPrice(
     return data.market_data.current_price.usd
   } catch (error) {
     console.log(`Error getting data for ${coin} on ${date}`)
+    return undefined
   }
 }
 
