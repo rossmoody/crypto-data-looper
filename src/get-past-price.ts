@@ -15,12 +15,6 @@ async function getPastPrice(
     }
   })
 
-  await new Promise(resolve => {
-    setTimeout(() => {
-      resolve("sleep")
-    }, index * 100)
-  })
-
   try {
     const { data } = await coingecko.get(`/${coin}/history?date=${date}`)
 
