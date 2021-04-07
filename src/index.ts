@@ -2,6 +2,7 @@ import makeDates from "./make-dates"
 import getMarketData from "./get-market-data"
 import getPastPrice from "./get-past-price"
 import database from "./firebase-database"
+import * as functions from "firebase-functions"
 
 function log(string: string) {
   console.log(string)
@@ -51,6 +52,6 @@ async function init(startDate: string): Promise<void> {
   log("Finished running script")
 }
 
-init("03-23-2021")
-
-export default init
+export const updateDatabase = functions.https.onRequest((req, resp) => {
+  init("03-23-2021")
+})
