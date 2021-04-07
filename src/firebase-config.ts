@@ -2,6 +2,7 @@ const config = {
   type: "service_account",
   project_id: "fomo-crypto-calculator",
   private_key_id: process.env.FOMO_KEY_ID,
+  // @ts-ignore: Object is possibly undefined
   private_key: process.env.FOMO_PRIVATE_KEY.replace(/\\n/g, "\n"),
   client_id: process.env.FOMO_CLIENT_ID,
   client_email:
