@@ -5,10 +5,10 @@ function reformatDate(date: Date): string {
 }
 
 /**
- * Returns an Array of dates in dd-mm-yyyy format
- * since the creation of Bitcoin (2009-01-03) until current day.
+ * Returns an Array of dates in mm-dd-yyyy format
+ * since the creation of Bitcoin (Jan 3rd 2009 / 03-01-2009) until current day.
  */
-function makeDates(start: string = "2009-01-03"): string[] {
+function makeDates(start: string = "03-01-2009"): string[] {
   const arr: string[] = []
 
   let startDate = new Date(start)
