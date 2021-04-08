@@ -16,11 +16,11 @@ interface Coin {
   price: number
 }
 
-async function init(startDate: string = "03-23-2020"): Promise<void> {
+async function init(): Promise<void> {
   let index = 0
-  const stopPoint = 15
+  const stopPoint = 25
 
-  const dates = makeDates(startDate)
+  const dates = makeDates()
 
   const coins = await getMarketData()
 
