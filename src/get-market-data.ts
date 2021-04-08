@@ -23,6 +23,7 @@ async function getMarketData(): Promise<string[]> {
 
     return data.map((coin: any) => coin.id)
   } catch (error) {
+    console.log("Couldn't get market data. Throwing an error...")
     throw error
   }
 }

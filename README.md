@@ -2,8 +2,6 @@
 
 This is an abstracted database updater function for use on the [fomocryptocalculator.com](https://www.fomocryptocalculator.com) website. The CoinGecko rate limiting was causing problems so I made this function to grab missing closing prices for available cryptocurrencies and log them to a database.
 
-It depends on Firebase private key environment variables inside `firebase-config.ts` and leverages Cloud Functions so it likely won't be of much use to you reading this.
-
 ## 🚀Setup locally
 
 ### 1. Install dependencies
@@ -26,4 +24,14 @@ In a separate terminal window run the below command. This will watch for changes
 
 ```bash
 npm start
+```
+
+## Firebase Functions
+
+There is a config file you will need to add that oulines `projectId`, `privateKey` and `clientEmail`. This is not tracked as the keys are private.
+
+To deploy the function run:
+
+```bash
+firebase deploy
 ```

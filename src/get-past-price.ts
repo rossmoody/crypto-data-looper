@@ -5,8 +5,7 @@ import axios from "axios"
  */
 async function getPastPrice(
   coin: string,
-  date: string,
-  index: number
+  date: string
 ): Promise<number | undefined> {
   const coingecko = axios.create({
     baseURL: "https://api.coingecko.com/api/v3/coins",
@@ -20,7 +19,7 @@ async function getPastPrice(
 
     if (!data.hasOwnProperty("market_data")) {
       console.log(`No price data for ${coin} on ${date}`)
-      return undefined
+      return 0
     }
 
     return data.market_data.current_price.usd

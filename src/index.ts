@@ -18,7 +18,7 @@ interface Coin {
 
 async function init(startDate: string = "03-23-2020"): Promise<void> {
   let index = 0
-  const stopPoint = 300
+  const stopPoint = 15
 
   const dates = makeDates(startDate)
 
@@ -37,7 +37,7 @@ async function init(startDate: string = "03-23-2020"): Promise<void> {
       for (const date of filteredDates) {
         if (index >= stopPoint) return log("Successfully updated database")
 
-        const pastPrice = await getPastPrice(coin, date, index)
+        const pastPrice = await getPastPrice(coin, date)
         index++
 
         if (pastPrice !== undefined) {
@@ -49,9 +49,7 @@ async function init(startDate: string = "03-23-2020"): Promise<void> {
     }
   }
 
-  log("Finished running script")
+  log("No more coins to get for now...")
 }
-
-init()
 
 export default init
