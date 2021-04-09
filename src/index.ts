@@ -3,10 +3,6 @@ import getMarketData from "./get-market-data"
 import getPastPrice from "./get-past-price"
 import database from "./firebase-database"
 
-function log(string: string) {
-  console.log(string)
-}
-
 function filterDates(dates: string[], coins: Coin[]) {
   return dates.filter(date => !coins.some(coin => coin.date === date))
 }
@@ -20,7 +16,7 @@ async function init(): Promise<void> {
   let index = 0
   const stopPoint = 25
 
-  const dates = makeDates()
+  const dates = makeDates("01-05-2020")
 
   const coins = await getMarketData()
 
@@ -42,14 +38,14 @@ async function init(): Promise<void> {
 
         if (pastPrice !== undefined) {
           snapshot = [...snapshot, { date: date, price: pastPrice }]
-          log(`${index}: ${coin} on ${date} at ${pastPrice}`)
+          console.log(`${index}: ${coin} on ${date} at ${pastPrice}`)
           coinRef.set(snapshot)
         }
       }
     }
   }
 
-  log("No more coins to get for now...")
+  console.log("No more coins to get for now...")
 }
 
 export default init

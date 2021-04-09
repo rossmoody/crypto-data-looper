@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions"
+
 import init from "../../src"
 import sortDatabase from "../../src/sort-database"
 
