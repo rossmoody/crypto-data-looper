@@ -35,7 +35,7 @@ async function init(): Promise<void> {
 
     if (filteredDates.length) {
       for (const date of filteredDates) {
-        if (index >= stopPoint) return log("Successfully updated database")
+        if (index >= stopPoint) return
 
         const pastPrice = await getPastPrice(coin, date)
         index++
