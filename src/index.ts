@@ -3,12 +3,6 @@ import getMarketIds from "./get-market-data"
 import getPastPrice from "./get-past-price"
 import database from "./firebase-database"
 
-function filterDates(dates: string[], coins: CoinDataObject) {
-  return dates.filter(date => {
-    return !Object.values(coins).some(coin => coin.date === date)
-  })
-}
-
 interface CoinDataObject {
   [key: string]: { date: string; price: number }
 }
@@ -16,21 +10,25 @@ interface CoinDataObject {
 async function init(): Promise<void> {
   const BITCOIN_START_DATE = "10-05-2009"
   const TODAY = new Date().toLocaleDateString()
-  const STOP_POINT = 40
+  const STOP_POINT = 30
 
   let index = 0
 
-  const dates = makeDates(BITCOIN_START_DATE, TODAY)
+  const dates = makeDates("10-05-2015", TODAY)
   const coinIDs = await getMarketIds()
 
   for (const coinID of coinIDs) {
     const coinRef = database.ref("coins").child(coinID)
 
-    let snapshot: CoinDataObject = (await coinRef.once("value")).val()
+    let snapshot: CoinDataObject | {} = (await coinRef.once("value")).val()
 
     if (!snapshot) snapshot = {}
 
-    const filteredDates = filterDates(dates, snapshot).reverse()
+    const existingDates = Object.values(snapshot).map(obj => obj.date)
+
+    const filteredDates = dates
+      .filter(date => !existingDates.includes(date))
+      .reverse()
 
     if (filteredDates.length) {
       for (const date of filteredDates) {
@@ -46,9 +44,8 @@ async function init(): Promise<void> {
 
         if (pastPrice === 0) {
           const backstory = makeDates(BITCOIN_START_DATE, date)
-          const validDates = filterDates(backstory, snapshot)
 
-          for (const day of validDates) {
+          for (const day of backstory) {
             coinRef.push({ date: day, price: 0 })
           }
 
