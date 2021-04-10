@@ -62,11 +62,12 @@ async function sortDatabase() {
       .reduce(eliminateDuplicates, [])
       .sort(sortDescending)
 
+    coinRef.child(coinName).set({})
+
     for (const datePriceObj of coinData) {
       datePriceObj.date = addLeadingZero(datePriceObj.date)
+      coinRef.child(coinName).push(datePriceObj)
     }
-
-    coinRef.child(coinName).set({ ...coinData })
   }
 }
 

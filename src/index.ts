@@ -19,12 +19,11 @@ async function init(): Promise<void> {
   const STOP_POINT = 40
 
   let index = 0
+
   const dates = makeDates(BITCOIN_START_DATE, TODAY)
   const coinIDs = await getMarketIds()
 
   for (const coinID of coinIDs) {
-    if (index >= STOP_POINT) return
-
     const coinRef = database.ref("coins").child(coinID)
 
     let snapshot: CoinDataObject = (await coinRef.once("value")).val()
@@ -52,6 +51,8 @@ async function init(): Promise<void> {
           for (const day of validDates) {
             coinRef.push({ date: day, price: 0 })
           }
+
+          return console.log(`Filled out the backstory for ${coinID}`)
         }
 
         if (pastPrice === undefined) {
