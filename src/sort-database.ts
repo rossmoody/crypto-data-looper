@@ -70,6 +70,4 @@ async function sortDatabase() {
   }
 }
 
-sortDatabase()
-
 export default sortDatabase

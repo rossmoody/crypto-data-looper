@@ -16,12 +16,10 @@ interface CoinDataObject {
 async function init(): Promise<void> {
   const BITCOIN_START_DATE = "10-05-2009"
   const TODAY = new Date().toLocaleDateString()
-  const STOP_POINT = 75
+  const STOP_POINT = 40
 
   let index = 0
-
   const dates = makeDates(BITCOIN_START_DATE, TODAY)
-
   const coinIDs = await getMarketIds()
 
   for (const coinID of coinIDs) {
@@ -41,6 +39,12 @@ async function init(): Promise<void> {
 
         const pastPrice = await getPastPrice(coinID, date)
 
+        if (pastPrice !== undefined) {
+          index++
+          console.log(`#${index}: ${coinID} | ${date} | ${pastPrice}`)
+          coinRef.push({ date: date, price: pastPrice })
+        }
+
         if (pastPrice === 0) {
           const backstory = makeDates(BITCOIN_START_DATE, date)
           const validDates = filterDates(backstory, snapshot)
@@ -48,12 +52,6 @@ async function init(): Promise<void> {
           for (const day of validDates) {
             coinRef.push({ date: day, price: 0 })
           }
-        }
-
-        if (pastPrice !== undefined) {
-          index++
-          console.log(`#${index}: ${coinID} | ${date} | ${pastPrice}`)
-          coinRef.push({ date: date, price: pastPrice })
         }
 
         if (pastPrice === undefined) {
