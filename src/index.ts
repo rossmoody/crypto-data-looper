@@ -1,51 +1,71 @@
 import makeDates from "./make-dates"
-import getMarketData from "./get-market-data"
+import getMarketIds from "./get-market-data"
 import getPastPrice from "./get-past-price"
 import database from "./firebase-database"
 
-function filterDates(dates: string[], coins: Coin[]) {
-  return dates.filter(date => !coins.some(coin => coin.date === date))
+function filterDates(dates: string[], coins: CoinDataObject) {
+  return dates.filter(date => {
+    return !Object.values(coins).some(coin => coin.date === date)
+  })
 }
 
-interface Coin {
-  date: string
-  price: number
+interface CoinDataObject {
+  [key: string]: { date: string; price: number }
 }
 
 async function init(): Promise<void> {
+  const BITCOIN_START_DATE = "10-05-2009"
+  const TODAY = new Date().toLocaleDateString()
+  const STOP_POINT = 75
+
   let index = 0
-  const stopPoint = 25
 
-  const dates = makeDates("01-05-2020")
+  const dates = makeDates(BITCOIN_START_DATE, TODAY)
 
-  const coins = await getMarketData()
+  const coinIDs = await getMarketIds()
 
-  for (const coin of coins) {
-    const coinRef = database.ref("coins").child(coin)
+  for (const coinID of coinIDs) {
+    if (index >= STOP_POINT) return
 
-    let snapshot = (await coinRef.once("value")).val()
+    const coinRef = database.ref("coins").child(coinID)
 
-    if (!snapshot) snapshot = []
+    let snapshot: CoinDataObject = (await coinRef.once("value")).val()
 
-    const filteredDates = filterDates(dates, snapshot)
+    if (!snapshot) snapshot = {}
+
+    const filteredDates = filterDates(dates, snapshot).reverse()
 
     if (filteredDates.length) {
       for (const date of filteredDates) {
-        if (index >= stopPoint) return
+        if (index >= STOP_POINT) return
 
-        const pastPrice = await getPastPrice(coin, date)
-        index++
+        const pastPrice = await getPastPrice(coinID, date)
+
+        if (pastPrice === 0) {
+          const backstory = makeDates(BITCOIN_START_DATE, date)
+          const validDates = filterDates(backstory, snapshot)
+
+          for (const day of validDates) {
+            coinRef.push({ date: day, price: 0 })
+          }
+        }
 
         if (pastPrice !== undefined) {
-          snapshot = [...snapshot, { date: date, price: pastPrice }]
-          console.log(`${index}: ${coin} on ${date} at ${pastPrice}`)
-          coinRef.set(snapshot)
+          index++
+          console.log(`#${index}: ${coinID} | ${date} | ${pastPrice}`)
+          coinRef.push({ date: date, price: pastPrice })
+        }
+
+        if (pastPrice === undefined) {
+          return console.log("Rate limited...")
         }
       }
     }
+
+    console.log(`No more prices to get for ${coinID}...`)
   }
 
-  console.log("No more coins to get for now...")
+  console.log(`Gathered all the coin data available...`)
 }
 
 export default init

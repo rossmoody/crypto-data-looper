@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "compile": "npx tsc -w",
-    "start": "npx nodemon ./dist/index.js",
+    "sort": "npx nodemon ./dist/sort-database.js",
+    "index": "npx nodemon ./dist/index.js",
     "prepare": "tsc"
   },
   "author": "Ross Moody <ross@rossmoody.com>",

@@ -18,7 +18,6 @@ async function getPastPrice(
     const { data } = await coingecko.get(`/${coin}/history?date=${date}`)
 
     if (!data.hasOwnProperty("market_data")) {
-      console.log(`No price data for ${coin} on ${date}`)
       return 0
     }
 

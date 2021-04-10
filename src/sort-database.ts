@@ -1,24 +1,16 @@
 import database from "./firebase-database"
 
-interface DatePrice {
+interface DatePriceObject {
   date: string
   price: number
 }
 
-interface CoinObject {
-  [key: string]: DatePrice[]
+interface DatePriceObjWithKey {
+  [key: string]: DatePriceObject
 }
 
-function formatDateToMDY(date: string): number {
-  const [day, month, year] = date.split("-")
-
-  return new Date(`${month}/${day}/${year}`).getTime()
-}
-
-function sortArray(array: DatePrice[]): DatePrice[] {
-  return array.sort((a, b) => {
-    return formatDateToMDY(b.date) - formatDateToMDY(a.date)
-  })
+interface CoinsList {
+  [key: string]: DatePriceObjWithKey
 }
 
 function addLeadingZero(date: string): string {
@@ -34,43 +26,50 @@ function addLeadingZero(date: string): string {
   return `${day}-${month}-${year}`
 }
 
-function reduceArray(data: DatePrice[]): DatePrice[] {
-  return data.reduce((acc: DatePrice[], current: DatePrice) => {
-    const x: DatePrice | undefined = acc.find(
-      item => item.date === current.date
-    )
+function eliminateDuplicates(acc: DatePriceObject[], current: DatePriceObject) {
+  const x: DatePriceObject | undefined = acc.find(
+    item => item.date === current.date
+  )
 
-    if (!x) {
-      return acc.concat([current])
-    }
+  if (!x) {
+    return acc.concat([current])
+  }
 
-    if (x.price < current.price) {
-      x.price = current.price
-    }
+  if (x.price < current.price) {
+    x.price = current.price
+  }
 
-    return acc
-  }, [])
+  return acc
+}
+
+function formatDateToMDY(date: string): number {
+  const [day, month, year] = date.split("-")
+
+  return new Date(`${month}/${day}/${year}`).getTime()
+}
+
+function sortDescending(a: DatePriceObject, b: DatePriceObject) {
+  return formatDateToMDY(b.date) - formatDateToMDY(a.date)
 }
 
 async function sortDatabase() {
-  let sortedCoins: CoinObject = {}
-
   const coinRef = database.ref("coins")
 
-  const coins: CoinObject = (await coinRef.once("value")).val()
+  const coinsList: CoinsList = (await coinRef.once("value")).val()
 
-  for (const [key, value] of Object.entries(coins)) {
-    const formattedValue = value.map(obj => {
-      obj.date = addLeadingZero(obj.date)
-      return obj
-    })
+  for (const [coinName, coinValue] of Object.entries(coinsList)) {
+    const coinData = Object.values(coinValue)
+      .reduce(eliminateDuplicates, [])
+      .sort(sortDescending)
 
-    const reducedPrices = reduceArray(formattedValue)
+    for (const datePriceObj of coinData) {
+      datePriceObj.date = addLeadingZero(datePriceObj.date)
+    }
 
-    sortedCoins[key] = sortArray(reducedPrices)
+    coinRef.child(coinName).set({ ...coinData })
   }
-
-  coinRef.set(sortedCoins)
 }
+
+sortDatabase()
 
 export default sortDatabase
