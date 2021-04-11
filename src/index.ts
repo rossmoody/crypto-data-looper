@@ -3,8 +3,8 @@ import getMarketIds from "./get-market-data"
 import getPastPrice from "./get-past-price"
 import database from "./firebase-database"
 
-interface CoinDataObject {
-  [key: string]: { date: string; price: number }
+interface Coin {
+  [date: string]: number
 }
 
 async function init(): Promise<void> {
@@ -20,11 +20,11 @@ async function init(): Promise<void> {
   for (const coinID of coinIDs) {
     const coinRef = database.ref("coins").child(coinID)
 
-    let snapshot: CoinDataObject | {} = (await coinRef.once("value")).val()
+    let data: Coin | undefined = (await coinRef.once("value")).val()
 
-    if (!snapshot) snapshot = {}
+    if (!data) data = {}
 
-    const existingDates = Object.values(snapshot).map(obj => obj.date)
+    const existingDates = Object.keys(data)
 
     const filteredDates = dates
       .filter(date => !existingDates.includes(date))
@@ -49,7 +49,8 @@ async function init(): Promise<void> {
 
         if (pastPrice) {
           console.log(`#${index}: ${coinID} | ${date} | ${pastPrice}`)
-          coinRef.push({ date: date, price: pastPrice })
+          const dateRef = coinRef.child(date)
+          dateRef.set(pastPrice)
         }
       }
     }

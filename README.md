@@ -1,6 +1,6 @@
 # The Crypto Looper
 
-This is an abstracted database updater function for use on the [fomocryptocalculator.com](https://www.fomocryptocalculator.com) website. The CoinGecko rate limiting was causing problems so I made this function to grab missing closing prices for available cryptocurrencies and log them to a database.
+This is a cryptocurrency database function for use on the [fomocryptocalculator.com](https://www.fomocryptocalculator.com) website. The CoinGecko rate limiting was causing problems so I made this function to grab all closing prices for all available cryptocurrencies since the creation of Bitcoin and log them to a Firebase database.
 
 ## 🚀Setup locally
 
@@ -20,10 +20,20 @@ npm run compile
 
 ### 3. Run the compiled files
 
-In a separate terminal window run the below command. This will watch for changes and rerun any functions in your terminal.
+First you will need to invoke the function in `index.ts` with `init()`.
+
+In a separate terminal window run the below command. This will watch for changes and rerun any functions in your terminal coming from the `index.ts` file.
 
 ```bash
-npm start
+npm run index
+```
+
+#### Sorting function
+
+To run the sorting function locally you will need to invoke it in the `sort-database.ts` file and run the below command.
+
+```bash
+npm run sort
 ```
 
 ## Firebase Functions
