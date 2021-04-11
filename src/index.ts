@@ -8,13 +8,13 @@ interface CoinDataObject {
 }
 
 async function init(): Promise<void> {
-  const BITCOIN_START_DATE = "10-05-2009"
   const TODAY = new Date().toLocaleDateString()
-  const STOP_POINT = 30
+  const STOP_POINT = 45
 
   let index = 0
 
-  const dates = makeDates("10-05-2015", TODAY)
+  const dates = makeDates("10-05-2013", TODAY)
+
   const coinIDs = await getMarketIds()
 
   for (const coinID of coinIDs) {
@@ -36,24 +36,20 @@ async function init(): Promise<void> {
 
         const pastPrice = await getPastPrice(coinID, date)
 
-        if (pastPrice !== undefined) {
-          index++
-          console.log(`#${index}: ${coinID} | ${date} | ${pastPrice}`)
-          coinRef.push({ date: date, price: pastPrice })
-        }
-
-        if (pastPrice === 0) {
-          const backstory = makeDates(BITCOIN_START_DATE, date)
-
-          for (const day of backstory) {
-            coinRef.push({ date: day, price: 0 })
-          }
-
-          return console.log(`Filled out the backstory for ${coinID}`)
-        }
+        index++
 
         if (pastPrice === undefined) {
-          return console.log("Rate limited...")
+          return console.log(`${coinID} rate limited...`)
+        }
+
+        if (pastPrice === null) {
+          console.log(`${index}: No prices before ${date} with ${coinID}`)
+          break
+        }
+
+        if (pastPrice) {
+          console.log(`#${index}: ${coinID} | ${date} | ${pastPrice}`)
+          coinRef.push({ date: date, price: pastPrice })
         }
       }
     }

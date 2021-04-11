@@ -5,16 +5,8 @@ interface DatePriceObject {
   price: number
 }
 
-interface DatePriceObjWithKey {
-  [key: string]: DatePriceObject
-}
-
-interface CoinsList {
-  [key: string]: DatePriceObjWithKey
-}
-
-function addLeadingZero(date: string): string {
-  const dayMonthYear = date.split("-")
+function addLeadingZero(obj: DatePriceObject): DatePriceObject {
+  const dayMonthYear = obj.date.split("-")
 
   const reformattedDayMonthYear = dayMonthYear.map(dmy => {
     if (dmy.length === 1) return `0${dmy}`
@@ -23,7 +15,9 @@ function addLeadingZero(date: string): string {
 
   const [day, month, year] = reformattedDayMonthYear
 
-  return `${day}-${month}-${year}`
+  obj.date = `${day}-${month}-${year}`
+
+  return obj
 }
 
 function eliminateDuplicates(acc: DatePriceObject[], current: DatePriceObject) {
@@ -55,19 +49,27 @@ function sortDescending(a: DatePriceObject, b: DatePriceObject) {
 async function sortDatabase() {
   const coinRef = database.ref("coins")
 
-  const coinsList: CoinsList = (await coinRef.once("value")).val()
+  const coinsList: string[] = Object.keys((await coinRef.once("value")).val())
 
-  for (const [coinName, coinValue] of Object.entries(coinsList)) {
-    const coinData = Object.values(coinValue)
-      .reduce(eliminateDuplicates, [])
-      .sort(sortDescending)
+  for (const coinID of coinsList) {
+    let childCoin = coinRef.child(coinID)
 
-    coinRef.child(coinName).set({})
+    childCoin.once("value", snapshot => {
+      let data: DatePriceObject[] = Object.values(snapshot.val())
 
-    for (const datePriceObj of coinData) {
-      datePriceObj.date = addLeadingZero(datePriceObj.date)
-      coinRef.child(coinName).push(datePriceObj)
-    }
+      childCoin.set({})
+
+      console.log(`Pushing item to ${coinID}...`)
+
+      data
+        .filter((obj: DatePriceObject) => obj.price != 0)
+        .reduce(eliminateDuplicates, [])
+        .sort(sortDescending)
+        .map(addLeadingZero)
+        .forEach(coin => childCoin.push(coin))
+
+      console.log(`Finished pushing to ${coinID}...`)
+    })
   }
 }
 

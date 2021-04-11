@@ -14,7 +14,7 @@ async function getMarketData(): Promise<string[]> {
   console.log("Fetching todays market data...")
 
   try {
-    const coinCount = 250
+    const coinCount = 200
     const { data } = await coingecko.get(
       `/markets?vs_currency=usd&order=market_cap_desc&per_page=${coinCount}&page=1&sparkline=false`
     )

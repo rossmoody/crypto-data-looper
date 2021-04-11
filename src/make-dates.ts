@@ -18,8 +18,7 @@ function addLeadingZero(date: string): string {
 }
 
 /**
- * Returns an Array of dates in mm-dd-yyyy format
- * since the creation of Bitcoin (Jan 3rd 2009 / 03-01-2009) until current day.
+ * Returns an Array of dates in mm-dd-yyyy format ensuring leading zeros.
  */
 function makeDates(start: string, end: string): string[] {
   const arr: string[] = []
